@@ -7,8 +7,11 @@ public class UISequencer : MonoBehaviour
     public BaseUIObject[] uiObjects;
     private int displayIndex = 0;
 
-
     void Start()
+    {
+    }
+
+    public void StartSequence()
     {
         OnAnimComplete();
     }
