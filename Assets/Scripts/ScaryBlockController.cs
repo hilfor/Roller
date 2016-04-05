@@ -7,23 +7,23 @@ public class ScaryBlockController : MonoBehaviour
     public Vector3 _movementDirection;
     public float _movementSpeed = 2f;
     public Vector3 _explosionVectorDirection;
-    
+
     public float _explosionForce = 2f;
 
-    private bool _movementEnabled = false;
+    private bool _movementEnabled = true;
 
-    private Transform _localTransform;
+    private Transform m_LocalTransform;
     private Vector3 _initialPosition;
     void Start()
     {
-        _localTransform = transform;
-        _initialPosition = _localTransform.position;
+        m_LocalTransform = transform;
+        _initialPosition = m_LocalTransform.position;
     }
 
     void Update()
     {
         if (_movementEnabled)
-            _localTransform.position = _localTransform.position + _movementDirection * _movementSpeed * Time.deltaTime;
+            m_LocalTransform.position = m_LocalTransform.position + _movementDirection * _movementSpeed * Time.deltaTime;
     }
 
     public void EnableMovement()
@@ -33,17 +33,28 @@ public class ScaryBlockController : MonoBehaviour
     public void DisableMovement()
     {
         _movementEnabled = false;
-        _localTransform.position = _initialPosition;
+        m_LocalTransform.position = _initialPosition;
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("On Collision " + collision.rigidbody.name);
+
+        if (collision.rigidbody.tag == "Player")
+        {
+            Debug.Log("Creating Explosion");
+            collision.rigidbody.GetComponent<BallController>().ScaryBlockHit(collision.contacts[0].point);
+        }
     }
 
     void OnTriggerEnter(Collider other)
     {
         Debug.Log("On trigger " + other.name);
-        if (other.name == "LevelPlayer")
+        if (other.tag == "Player")
         {
             Debug.Log("Creating Explosion");
-            other.GetComponent<Rigidbody>().AddForce(_localTransform.forward + _explosionVectorDirection * _explosionForce);
-            other.GetComponent<UnityStandardAssets.Vehicles.Ball.Ball>().ScaryBlockHit(other.transform.position);
+            other.GetComponent<BallController>().ScaryBlockHit(m_LocalTransform.forward);
+            //other.GetComponent<Rigidbody>().AddForce(_localTransform.forward + _explosionVectorDirection * _explosionForce);
         }
     }
 }

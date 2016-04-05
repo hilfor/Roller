@@ -13,6 +13,8 @@ public class BallController : MonoBehaviour
     private Vector2 m_SwipeStartPosition;
     private Vector2 m_SwipeEndPosition;
 
+    private float m_ExplosionForce = 10f;
+
     private Rigidbody m_RigidBody;
 
     private GameManager m_Path;
@@ -70,6 +72,11 @@ public class BallController : MonoBehaviour
     {
         m_Path.UpdateScore(m_MoveDirection);
         m_RigidBody.AddTorque(new Vector3(m_MoveDirection.z, 0, -m_MoveDirection.x) * m_MovePower);
+    }
+
+    public void ScaryBlockHit(Vector3 explosionPoint)
+    {
+        m_RigidBody.AddExplosionForce(m_ExplosionForce, explosionPoint, 3f);
     }
 
 }

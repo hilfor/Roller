@@ -4,18 +4,26 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject m_FirstFloorSegment;
+
     [SerializeField]
     private GameObject m_PlayerPrefab;
     [SerializeField]
+    private GameObject m_ScaryBlockPrefab;
+    [SerializeField]
     private Transform m_BlockSpawnPosition;
     [SerializeField]
+    private GameObject m_FirstFloorSegment;
+    [SerializeField]
     private GameObject[] m_FloorSegments;
+    [SerializeField]
+    private GameObject m_WinFloorSegment;
     [SerializeField]
     private BorderSpawner m_TopSpawnBorder;
     [SerializeField]
     private AnimationCurve m_ScoreCurve;
+    [SerializeField]
+    private int m_CourseLength = 3;
+
 
     private Text m_ScoreCounter;
 
@@ -38,6 +46,8 @@ public class GameManager : MonoBehaviour
         m_CurrentVisibleRoadTransform = m_CurrentVisibleRoad.transform;
         GameObject playerObject = Instantiate(m_PlayerPrefab, m_BlockSpawnPosition.position + Vector3.up, Quaternion.identity) as GameObject;
         m_PlayerController = playerObject.GetComponent<BallController>();
+        GameObject scaryObject = Instantiate(m_ScaryBlockPrefab, m_BlockSpawnPosition.position - new Vector3(0, 0, 15), Quaternion.identity) as GameObject;
+
         Camera.main.GetComponent<UnityStandardAssets.Utility.FollowTarget>().target = playerObject.transform;
 
     }
@@ -49,21 +59,33 @@ public class GameManager : MonoBehaviour
 
     void SpawnNewRoadSegment(Vector3 position)
     {
-        GameObject spawnObject;
-        if (m_FloorSegments.Length > 0)
+        if (m_CourseLength == 0)
+            return;
+
+        GameObject spawnNextPrefab;
+        if (m_CourseLength == 1)
         {
-            spawnObject = m_FloorSegments[Random.Range(0, m_FloorSegments.Length - 1)];
+            spawnNextPrefab = m_WinFloorSegment;
         }
         else
         {
-            spawnObject = m_FirstFloorSegment;
+            if (m_FloorSegments.Length > 0)
+            {
+                spawnNextPrefab = m_FloorSegments[Random.Range(0, m_FloorSegments.Length - 1)];
+            }
+            else
+            {
+                spawnNextPrefab = m_FirstFloorSegment;
+            }
         }
+        m_CourseLength--;
+
         position.y = m_CurrentVisibleRoadTransform.position.y;
         position.x = m_CurrentVisibleRoadTransform.position.x;
 
         Debug.Log("Spawning next segment at " + position);
 
-        m_CurrentVisibleRoad = Instantiate(spawnObject, position, Quaternion.identity) as GameObject;
+        m_CurrentVisibleRoad = Instantiate(spawnNextPrefab, position, Quaternion.identity) as GameObject;
         m_CurrentVisibleRoadTransform = m_CurrentVisibleRoad.transform;
     }
 
