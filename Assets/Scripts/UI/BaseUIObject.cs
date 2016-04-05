@@ -2,9 +2,9 @@
 using System;
 using System.Collections;
 
-public class BaseUIObject : MonoBehaviour {
+public abstract class BaseUIObject : MonoBehaviour {
 
     public Action _onComplete;
 
-
+    public abstract void StartAnim();
 }

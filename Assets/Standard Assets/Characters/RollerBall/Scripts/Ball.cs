@@ -1,5 +1,3 @@
-using System;
-using UnityEngine.UI;
 using UnityEngine;
 
 namespace UnityStandardAssets.Vehicles.Ball
@@ -16,12 +14,12 @@ namespace UnityStandardAssets.Vehicles.Ball
         private float m_MaxAngularVelocity = 25; // The maximum velocity the ball can rotate at.
         [SerializeField]
         private float m_JumpPower = 2; // The force added to the ball when it jumps.
-        [SerializeField]
-        private GameObject m_ExplosionHit;
-        [SerializeField]
-        private GameObject m_ExplosionDestroy;
-        [SerializeField]
-        private Text m_ScoreUI;
+        //[SerializeField]
+        //private GameObject m_ExplosionHit;
+        //[SerializeField]
+        //private GameObject m_ExplosionDestroy;
+        //[SerializeField]
+        //private Text m_ScoreUI;
 
         private float m_CurrentScore = 0;
         
@@ -30,7 +28,7 @@ namespace UnityStandardAssets.Vehicles.Ball
         private Rigidbody m_Rigidbody;
         private Transform m_Transform;
 
-
+        
         private void Start()
         {
             m_Rigidbody = GetComponent<Rigidbody>();
@@ -41,15 +39,15 @@ namespace UnityStandardAssets.Vehicles.Ball
 
         public void ScaryBlockHit(Vector3 hitPoint)
         {
-            if (--m_Life > 0)
-            {
-                Instantiate(m_ExplosionHit, hitPoint, Quaternion.identity);
-            }
-            else
-            {
-                Instantiate(m_ExplosionDestroy, hitPoint, Quaternion.identity);
+            //if (--m_Life > 0)
+            //{
+            //    Instantiate(m_ExplosionHit, hitPoint, Quaternion.identity);
+            //}
+            //else
+            //{
+            //    Instantiate(m_ExplosionDestroy, hitPoint, Quaternion.identity);
 
-            }
+            //}
 
         }
 
@@ -78,8 +76,8 @@ namespace UnityStandardAssets.Vehicles.Ball
 
         private void Update()
         {
-            m_CurrentScore += Time.deltaTime;
-            m_ScoreUI.text = m_CurrentScore.ToString();
+            //m_CurrentScore += Time.deltaTime;
+            //m_ScoreUI.text = m_CurrentScore.ToString();
         }
     }
 }

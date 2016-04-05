@@ -1,29 +1,61 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
-public class Instructions : BaseUIObject{
-    public float _destroyAfter = 3f;
-    public Vector3 _targetScale;
-    public Transform _introductionText;
-    private Coroutine coroutine;
+public class Instructions : BaseUIObject
+{
+    [SerializeField]
+    private float m_HideAfter = 4f;
 
-    public AnimationCurve curve;
-    private float lerpCont = 0f;
-    public float _lerpSpeed = .5f;
-    void Start()
+    private float m_CompleteAfter = 2f;
+
+    private Animator m_Animator;
+
+    private float m_DisplayTimeCounter = 0f;
+    private float m_CompleteTimeCounter = 0f;
+    private bool m_Disabled = true;
+
+    private bool m_HideAnimStarted = false;
+
+    void Awake()
     {
-        Destroy(gameObject, _destroyAfter);
+        m_Animator = GetComponent<Animator>();
+    }
+
+    public override void StartAnim()
+    {
+        m_Animator.SetTrigger("Show");
+        m_Disabled = false;
     }
 
     void Update()
     {
-        _introductionText.localScale = Vector3.Lerp(_introductionText.localScale, _targetScale, curve.Evaluate(lerpCont));
-        lerpCont += Time.deltaTime * _lerpSpeed;
+        if (m_Disabled) return;
+
+        if (m_DisplayTimeCounter < m_HideAfter)
+        {
+            m_DisplayTimeCounter += Time.deltaTime;
+        }
+        else
+        {
+            StartHideAnim();
+            if (m_CompleteTimeCounter < m_CompleteAfter)
+            {
+                m_CompleteTimeCounter += Time.deltaTime;
+            }
+            else
+            {
+                _onComplete.Invoke();
+                m_Disabled = true;
+            }
+        }
     }
 
-    void OnDestroy()
+    void StartHideAnim()
     {
-        _onComplete.Invoke();
+        if (m_HideAnimStarted)
+            return;
+        m_Animator.SetTrigger("Hide");
+        m_HideAnimStarted = true;
     }
-
 }

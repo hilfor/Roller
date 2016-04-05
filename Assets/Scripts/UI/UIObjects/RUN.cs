@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System;
 
 public class RUN : BaseUIObject
 {
@@ -40,7 +41,8 @@ public class RUN : BaseUIObject
         _onComplete.Invoke();
     }
 
-
-
-
+    public override void StartAnim()
+    {
+        throw new NotImplementedException();
+    }
 }
