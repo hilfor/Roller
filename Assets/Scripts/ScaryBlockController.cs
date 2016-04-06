@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class ScaryBlockController : MonoBehaviour
 {
@@ -10,10 +11,38 @@ public class ScaryBlockController : MonoBehaviour
 
     public float _explosionForce = 2f;
 
-    private bool _movementEnabled = true;
+    private bool m_MovementEnabled = true;
 
     private Transform m_LocalTransform;
     private Vector3 _initialPosition;
+
+    void Awake()
+    {
+        RegisterEvents();
+    }
+
+    private void RegisterEvents()
+    {
+        EventBus.GameLost.AddListener(LevelEnded);
+        EventBus.GameWon.AddListener(LevelEnded);
+    }
+
+    void OnDestroy()
+    {
+        ClearEvents();
+    }
+
+    private void ClearEvents()
+    {
+        EventBus.GameLost.RemoveListener(LevelEnded);
+        EventBus.GameWon.RemoveListener(LevelEnded);
+    }
+
+    private void LevelEnded()
+    {
+        m_MovementEnabled = false;
+    }
+
     void Start()
     {
         m_LocalTransform = transform;
@@ -22,19 +51,19 @@ public class ScaryBlockController : MonoBehaviour
 
     void Update()
     {
-        if (_movementEnabled)
+        if (m_MovementEnabled)
             m_LocalTransform.position = m_LocalTransform.position + _movementDirection * _movementSpeed * Time.deltaTime;
     }
 
-    public void EnableMovement()
-    {
-        _movementEnabled = true;
-    }
-    public void DisableMovement()
-    {
-        _movementEnabled = false;
-        m_LocalTransform.position = _initialPosition;
-    }
+    //public void EnableMovement()
+    //{
+    //    m_MovementEnabled = true;
+    //}
+    //public void DisableMovement()
+    //{
+    //    m_MovementEnabled = false;
+    //    m_LocalTransform.position = _initialPosition;
+    //}
 
     public void OnCollisionEnter(Collision collision)
     {

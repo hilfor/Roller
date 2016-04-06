@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class BallController : MonoBehaviour
@@ -18,6 +19,34 @@ public class BallController : MonoBehaviour
     private Rigidbody m_RigidBody;
 
     private GameManager m_Path;
+    private bool m_IsMoveable = true;
+
+    void Awake()
+    {
+        RegisterEvents();
+    }
+
+    void OnDestroy()
+    {
+        RemoveEvents();
+    }
+
+    private void RemoveEvents()
+    {
+        EventBus.GameWon.RemoveListener(LevelEnded);
+        EventBus.GameLost.RemoveListener(LevelEnded);
+    }
+
+    private void RegisterEvents()
+    {
+        EventBus.GameWon.AddListener(LevelEnded);
+        EventBus.GameLost.AddListener(LevelEnded);
+    }
+
+    private void LevelEnded()
+    {
+        m_IsMoveable = false;
+    }
 
     void Start()
     {
@@ -31,6 +60,8 @@ public class BallController : MonoBehaviour
 
     void Update()
     {
+        if (!m_IsMoveable)
+            return;
 
         Vector2 swipeDirection = GetInputSwipeDirection();
 
@@ -70,6 +101,8 @@ public class BallController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (!m_IsMoveable)
+            return;
         m_Path.UpdateScore(m_MoveDirection);
         m_RigidBody.AddTorque(new Vector3(m_MoveDirection.z, 0, -m_MoveDirection.x) * m_MovePower);
     }

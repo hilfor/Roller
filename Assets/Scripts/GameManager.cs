@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     private GameObject m_ScaryBlockPrefab;
     [SerializeField]
     private Transform m_BlockSpawnPosition;
+    [SerializeField]
+    private Transform m_CameraInitialPosition;
     [SerializeField]
     private GameObject m_FirstFloorSegment;
     [SerializeField]
@@ -24,9 +26,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private int m_CourseLength = 3;
 
+    private int m_CurrentCourseLength = 0;
 
     private Text m_ScoreCounter;
-
 
     private BallController m_PlayerController;
 
@@ -37,19 +39,76 @@ public class GameManager : MonoBehaviour
 
     private float m_ScoreCount = 0;
 
+    private GameObject m_ScaryBlock;
+    private GameObject m_Player;
+    private List<GameObject> m_RoadSegments = new List<GameObject>();
+
+    private bool m_GamePaused = false;
+    private bool m_GameEnded = false;
+
     void Awake()
     {
 
         m_ScoreCounter = GameObject.Find("ScoreData").GetComponent<Text>();
+        RegisterEvents();
+        InitializeLevel();
 
+    }
+
+    void RegisterEvents()
+    {
+        EventBus.NextDifficulty.AddListener(ResetLevel);
+    }
+
+    public void OnDestroy()
+    {
+        RemoveEvents();
+    }
+
+    void RemoveEvents()
+    {
+        EventBus.NextDifficulty.RemoveListener(ResetLevel);
+    }
+
+    void InitializeLevel()
+    {
         m_CurrentVisibleRoad = Instantiate(m_FirstFloorSegment, m_BlockSpawnPosition.position, Quaternion.identity) as GameObject;
+        m_RoadSegments.Add(m_CurrentVisibleRoad);
         m_CurrentVisibleRoadTransform = m_CurrentVisibleRoad.transform;
-        GameObject playerObject = Instantiate(m_PlayerPrefab, m_BlockSpawnPosition.position + Vector3.up, Quaternion.identity) as GameObject;
-        m_PlayerController = playerObject.GetComponent<BallController>();
-        GameObject scaryObject = Instantiate(m_ScaryBlockPrefab, m_BlockSpawnPosition.position - new Vector3(0, 0, 15), Quaternion.identity) as GameObject;
 
-        Camera.main.GetComponent<UnityStandardAssets.Utility.FollowTarget>().target = playerObject.transform;
+        m_Player = Instantiate(m_PlayerPrefab, m_BlockSpawnPosition.position + Vector3.up, Quaternion.identity) as GameObject;
+        m_PlayerController = m_Player.GetComponent<BallController>();
+        m_ScaryBlock = Instantiate(m_ScaryBlockPrefab, m_BlockSpawnPosition.position - new Vector3(0, 0, 15), Quaternion.identity) as GameObject;
 
+        m_CurrentCourseLength = m_CourseLength;
+
+        Camera.main.transform.position = m_CameraInitialPosition.position;
+        Camera.main.transform.rotation = m_CameraInitialPosition.rotation;
+
+        Camera.main.GetComponent<UnityStandardAssets.Utility.FollowTarget>().target = m_Player.transform;
+    }
+
+    void ResetLevel()
+    {
+        ClearLevel();
+        MakeLevelHarder();
+        InitializeLevel();
+        m_GameEnded = false;
+    }
+
+    void MakeLevelHarder()
+    {
+        m_CourseLength++;
+    }
+
+    void ClearLevel()
+    {
+        Destroy(m_Player);
+        Destroy(m_ScaryBlock);
+        for (int i = 0; i < m_RoadSegments.Count; i++)
+        {
+            Destroy(m_RoadSegments[i]);
+        }
     }
 
     void Start()
@@ -59,11 +118,11 @@ public class GameManager : MonoBehaviour
 
     void SpawnNewRoadSegment(Vector3 position)
     {
-        if (m_CourseLength == 0)
+        if (m_CurrentCourseLength == 0)
             return;
 
         GameObject spawnNextPrefab;
-        if (m_CourseLength == 1)
+        if (m_CurrentCourseLength == 1)
         {
             spawnNextPrefab = m_WinFloorSegment;
         }
@@ -78,19 +137,20 @@ public class GameManager : MonoBehaviour
                 spawnNextPrefab = m_FirstFloorSegment;
             }
         }
-        m_CourseLength--;
+        m_CurrentCourseLength--;
 
         position.y = m_CurrentVisibleRoadTransform.position.y;
         position.x = m_CurrentVisibleRoadTransform.position.x;
 
-        Debug.Log("Spawning next segment at " + position);
-
         m_CurrentVisibleRoad = Instantiate(spawnNextPrefab, position, Quaternion.identity) as GameObject;
+        m_RoadSegments.Add(m_CurrentVisibleRoad);
         m_CurrentVisibleRoadTransform = m_CurrentVisibleRoad.transform;
     }
 
     public void UpdateScore(Vector3 movement)
     {
+        if (m_GameEnded)
+            return;
         m_ScoreCount += Time.deltaTime * m_ScoreCurve.Evaluate(movement.z);
         if (m_ScoreCounter)
         {

@@ -5,8 +5,11 @@ public class EndLevel : MonoBehaviour
 
     private void OnTriggerEnter(Collider col)
     {
-        if (col.name == "Player")
-            EventBus.GameOver.Dispatch();
+        Debug.Log("Trigger activated by " + col.name);
+        if (col.tag == "Player")
+            EventBus.GameWon.Dispatch();
+        //if (col.name == "ScaryBlock")
+        //    EventBus.GameLost.Dispatch();
     }
 
 }
