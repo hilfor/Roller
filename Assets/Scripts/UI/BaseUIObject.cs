@@ -4,7 +4,8 @@ using System.Collections;
 
 public abstract class BaseUIObject : MonoBehaviour {
 
-    public Action _onComplete;
+    public Action OnCompleteCallback;
+
 
     public abstract void StartAnim();
 }

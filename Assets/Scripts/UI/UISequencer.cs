@@ -7,6 +7,8 @@ public class UISequencer : MonoBehaviour
 
     public BaseUIObject[] m_StartGameSequence;
 
+    //public BaseUIObject[] m_GameEndedSequence;
+
     public BaseUIObject[] m_GameOverSequence;
     public BaseUIObject[] m_WinSequence;
 
@@ -21,8 +23,8 @@ public class UISequencer : MonoBehaviour
 
     void RegisterEvents()
     {
-        EventBus.GameLost.AddListener(GameOverEvent);
-        EventBus.GameWon.AddListener(GameWonEvent);
+
+        EventBus.LevelEnded.AddListener(GameEnded);
     }
 
     public void OnDestroy()
@@ -32,10 +34,16 @@ public class UISequencer : MonoBehaviour
 
     private void RemoveEvents()
     {
-        EventBus.GameLost.RemoveListener(GameOverEvent);
-        EventBus.GameWon.RemoveListener(GameWonEvent);
+        EventBus.LevelEnded.RemoveListener(GameEnded);
     }
 
+    void GameEnded(GameState state)
+    {
+        if (state == GameState.GameWon)
+            GameWonEvent();
+        else
+            GameOverEvent();
+    }
     void GameOverEvent()
     {
         if (m_GameOverSequence.Length > 0)
@@ -46,34 +54,32 @@ public class UISequencer : MonoBehaviour
 
     void GameWonEvent()
     {
-        Debug.Log("UISequence displaying win UI");
+        //Debug.Log("UISequence displaying win UI");
         if (m_WinSequence.Length > 0)
         {
             m_WinSequence[m_WinSequenceDisplayIndex++].StartAnim();
         }
     }
 
-
-
     void Start()
     {
-        if (m_StartGameSequence.Length > 0)
-        {
-            SetOnCompleteCallback(m_StartGameSequence, OnStartSequenceComplete);
-            m_StartGameSequence[m_StartSequenceDisplayIndex++].StartAnim();
-        }
+
+        SetOnCompleteCallback(m_StartGameSequence, OnStartSequenceComplete);
         SetOnCompleteCallback(m_GameOverSequence, OnGameOverSequenceComplete);
         SetOnCompleteCallback(m_WinSequence, OnWinSequenceComplete);
 
+        if (m_StartGameSequence.Length > 0)
+        {
+            m_StartGameSequence[m_StartSequenceDisplayIndex++].StartAnim();
+        }
+
     }
-
-
 
     private void SetOnCompleteCallback(BaseUIObject[] uiObjects, Action act)
     {
         for (int i = 0; i < uiObjects.Length; i++)
         {
-            uiObjects[i]._onComplete += act;
+            uiObjects[i].OnCompleteCallback += act;
         }
     }
 

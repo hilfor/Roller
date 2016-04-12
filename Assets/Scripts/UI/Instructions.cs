@@ -45,7 +45,7 @@ public class Instructions : BaseUIObject
             }
             else
             {
-                _onComplete.Invoke();
+                OnCompleteCallback.Invoke();
                 m_Disabled = true;
             }
         }
