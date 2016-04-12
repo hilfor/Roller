@@ -67,11 +67,6 @@ public class BallController : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-
-    }
-
     void Update()
     {
         if (!m_IsMoveable)
@@ -82,7 +77,12 @@ public class BallController : MonoBehaviour
         if (m_MainCam != null)
         {
             Vector3 camForward = Vector3.Scale(m_MainCam.forward, new Vector3(1, 0, 1)).normalized;
+            if (swipeDirection != Vector2.zero)
+                Debug.Log("Swipe Direction" + swipeDirection);
+
             m_MoveDirection = (swipeDirection.y * camForward + swipeDirection.x * m_MainCam.right).normalized;
+            if (m_MoveDirection != Vector3.zero)
+                Debug.Log("Move Direction" + m_MoveDirection);
         }
         else
         {
@@ -146,7 +146,9 @@ public class BallController : MonoBehaviour
         if (!m_IsMoveable)
             return;
         m_Path.UpdateScore(m_MoveDirection);
-        m_RigidBody.AddTorque(new Vector3(m_MoveDirection.z, 0, -m_MoveDirection.x) * m_MovemenMultiplier);
+        //m_RigidBody.AddTorque(new Vector3(m_MoveDirection.z, 0, -m_MoveDirection.x) * m_MovemenMultiplier);
+        //m_RigidBody.AddTorque(m_MoveDirection * m_MovemenMultiplier, ForceMode.VelocityChange);
+        m_RigidBody.AddForce(m_MoveDirection * m_MovemenMultiplier, ForceMode.VelocityChange);
     }
 
     public void ScaryBlockHit(Vector3 explosionPoint)

@@ -28,6 +28,11 @@ public class Instructions : BaseUIObject
         m_Disabled = false;
     }
 
+    public void OnAnimationComplete()
+    {
+
+    }
+
     void Update()
     {
         if (m_Disabled) return;

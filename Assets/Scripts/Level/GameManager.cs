@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject m_DepthDeathTriggerPrefab;
     [SerializeField]
-    private Transform m_BlockSpawnPosition;
+    private Transform m_AncorSpawnPosition;
     [SerializeField]
     private Transform m_CameraInitialPosition;
     [SerializeField]
@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
     private AnimationCurve m_ScoreCurve;
     [SerializeField]
     private float m_ScaryBlockSpeed = 1.7f;
+    [SerializeField]
+    private float m_ScaryBlockSpawnDisntance = 15f;
     [SerializeField]
     private int m_CourseLength = 3;
 
@@ -68,8 +70,6 @@ public class GameManager : MonoBehaviour
 
     void RegisterEvents()
     {
-
-
         EventBus.LevelEnded.AddListener(LevelEnded);
         EventBus.NextDifficulty.AddListener(ResetLevel);
     }
@@ -79,7 +79,6 @@ public class GameManager : MonoBehaviour
         m_GameEnded = true;
         if (m_ScoreObject)
             m_ScoreObject.gameObject.SetActive(false);
-
     }
 
     public void OnDestroy()
@@ -95,13 +94,13 @@ public class GameManager : MonoBehaviour
 
     void InitializeLevel()
     {
-        m_CurrentVisibleRoad = Instantiate(m_FirstFloorSegment, m_BlockSpawnPosition.position, Quaternion.identity) as GameObject;
+        m_CurrentVisibleRoad = Instantiate(m_FirstFloorSegment, m_AncorSpawnPosition.position, Quaternion.identity) as GameObject;
         m_RoadSegments.Add(m_CurrentVisibleRoad);
         m_CurrentVisibleRoadTransform = m_CurrentVisibleRoad.transform;
 
-        m_Player = Instantiate(m_PlayerPrefab, m_BlockSpawnPosition.position + Vector3.up, Quaternion.identity) as GameObject;
+        m_Player = Instantiate(m_PlayerPrefab, m_AncorSpawnPosition.position + Vector3.up, Quaternion.identity) as GameObject;
         m_PlayerController = m_Player.GetComponent<BallController>();
-        m_ScaryBlock = Instantiate(m_ScaryBlockPrefab, m_BlockSpawnPosition.position - new Vector3(0, 0, 15), Quaternion.identity) as GameObject;
+        m_ScaryBlock = Instantiate(m_ScaryBlockPrefab, m_AncorSpawnPosition.position - new Vector3(0, 0, m_ScaryBlockSpawnDisntance), Quaternion.identity) as GameObject;
         m_ScaryBlock.GetComponent<ScaryBlockController>().MovementSpeed = m_ScaryBlockSpeed;
         m_DepthDeathTrigger = Instantiate(m_DepthDeathTriggerPrefab, m_Player.transform.position, Quaternion.identity) as GameObject;
         m_CurrentCourseLength = m_CourseLength;

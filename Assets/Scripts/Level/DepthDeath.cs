@@ -31,6 +31,16 @@ public class DepthDeath : MonoBehaviour
         Destroy(gameObject);
     }
 
+    public void OnDestroy()
+    {
+        RemoveEvents();
+    }
+
+    private void RemoveEvents()
+    {
+        EventBus.LevelEnded.RemoveListener(LevelEnded);
+    }
+
     void Update()
     {
         if (m_PlayerTransform)

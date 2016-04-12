@@ -14,6 +14,11 @@ public class ShowScore : MonoBehaviour
         EventBus.LevelEnded.AddListener(UpdateScore);
     }
 
+    public void OnDestroy()
+    {
+        EventBus.LevelEnded.RemoveListener(UpdateScore);
+    }
+
     void UpdateScore(GameState state)
     {
         m_Text.text = "Your Score " + m_GameManager.Score;
