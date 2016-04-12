@@ -8,4 +8,10 @@ public class LoadMainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("Main");
     }
+
+    public void FixedUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            LoadMenu();
+    }
 }
