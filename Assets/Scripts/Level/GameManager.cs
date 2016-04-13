@@ -175,7 +175,7 @@ public class GameManager : MonoBehaviour
     {
         if (m_GameEnded)
             return;
-        m_ScoreCount += Time.deltaTime * 2 * m_ScoreCurve.Evaluate(movement.z);
+        m_ScoreCount += Time.deltaTime * 2 * m_ScoreCurve.Evaluate(movement.z)*10;
         if (m_ScoreCounter)
             m_ScoreCounter.text = Score;
     }
